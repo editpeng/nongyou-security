@@ -1,0 +1,4 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.nongyou.security.core.config.UsernamePasswordAuthenticationSecurityConfig,\
+com.nongyou.security.core.config.ValidateCodeSecurityConfig,\
+com.nongyou.security.core.config.SecurityConfig
