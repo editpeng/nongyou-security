@@ -1,5 +1,6 @@
 package com.nongyou.security.core.properties;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Data;
@@ -11,6 +12,6 @@ public class ValidateCodeSecurityProperties {
 	private Integer imageLetters = 4;
 	private Integer expireInSeconds = 120;
 	private Integer smsLetters = 6;
-	private List<String> imageCodeValidateUrls;
-	private List<String> smsCodeValidateUrls;
+	private List<String> imageCodeValidateUrls = new ArrayList<>();
+	private List<String> smsCodeValidateUrls = new ArrayList<>();
 }

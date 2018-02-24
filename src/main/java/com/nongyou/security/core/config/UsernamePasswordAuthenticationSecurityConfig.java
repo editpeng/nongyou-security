@@ -1,6 +1,7 @@
 package com.nongyou.security.core.config;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,8 +19,9 @@ import com.nongyou.security.core.username.CustomUserService;
 import com.nongyou.security.core.username.CustomUserServiceImpl;
 
 @Configuration
+@EnableConfigurationProperties(SecurityProperties.class)
 public class UsernamePasswordAuthenticationSecurityConfig {
-
+	
 	@Bean
 	@ConditionalOnMissingBean(PasswordEncoder.class)
 	public PasswordEncoder passwordEncoder() {
@@ -28,7 +30,7 @@ public class UsernamePasswordAuthenticationSecurityConfig {
 
 	@Bean
 	@ConditionalOnMissingBean(CustomUserService.class)
-	public CustomUserService customUserService(SecurityProperties securityProperties,PasswordEncoder passwordEncoder) {
+	public CustomUserService customUserService(PasswordEncoder passwordEncoder,SecurityProperties securityProperties) {
 		return new CustomUserServiceImpl(securityProperties,passwordEncoder);
 	}
 

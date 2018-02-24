@@ -16,6 +16,9 @@ public class SmsCodeGenerator implements ValidateCodeGenerator {
 	
 	@Override
 	public ValidateCode create(HttpServletRequest request) {
+		if(securityProperties == null) {
+			throw new RuntimeException("A dependency of SecurityProperties instance required!");
+		}
 		String mobile = request.getParameter("mobile");
 		Integer random = RandomUtils.nextInt(100000, 1000000);		
 		return new SmsCode(random.toString(), securityProperties.getValidateCodeSecurityProperties().getExpireInSeconds(), mobile);

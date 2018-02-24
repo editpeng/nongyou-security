@@ -1,8 +1,8 @@
 package com.nongyou.security.core.config;
 
 import javax.sql.DataSource;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -17,14 +17,8 @@ import com.nongyou.security.core.username.rememberMe.RememberMeSecurityConfigure
 import com.nongyou.security.core.validateCode.ValidateCodeFilterSecurityConfigurer;
 
 @Configuration
+@AutoConfigureAfter({UsernamePasswordAuthenticationSecurityConfig.class,ValidateCodeSecurityConfig.class})
 public class SecurityConfig {
-
-	@Bean
-	@ConfigurationProperties(prefix = "nongyou.security")
-	public SecurityProperties securityProperties() {
-		return new SecurityProperties();
-	}
-
 	@Bean
 	public ValidateCodeFilterSecurityConfigurer validateCodeFilterSecurityConfigurer(
 			SecurityProperties securityProperties) {
@@ -56,17 +50,23 @@ public class SecurityConfig {
 	@Bean
 	public WebSecurityConfigurerAdapter webSecurityConfigurerAdapter(UsernamePasswordAuthenticationSecurityConfigurer usernamePasswordAuthenticationSecurityConfigurer,
 			ValidateCodeFilterSecurityConfigurer validateCodeFilterSecurityConfigurer, SmsCodeAuthenticationSecurityConfigurer smsCodeAuthenticationSecurityConfigurer,
-			SecurityProperties securityProperties,RememberMeSecurityConfigurer rememberMeSecurityConfigurer) {
+			SecurityProperties securityProperties,DataSource dataSource) {
 		return new WebSecurityConfigurerAdapter() {
 			@Override
 			protected void configure(HttpSecurity builder) throws Exception {
-				builder.apply(usernamePasswordAuthenticationSecurityConfigurer);
-				builder.apply(validateCodeFilterSecurityConfigurer);
-				builder.apply(smsCodeAuthenticationSecurityConfigurer);
+				usernamePasswordAuthenticationSecurityConfigurer.configureForm(builder);
+				validateCodeFilterSecurityConfigurer.configureValidateCode(builder);
+				smsCodeAuthenticationSecurityConfigurer.configureSmsAuth(builder);
 				if(securityProperties.getUsernamePasswordSecurityProperties().isRememberMe()) {
-					builder.apply(rememberMeSecurityConfigurer);
+					rememberMeSecurityConfigurer(dataSource,securityProperties).configureRememberMe(builder);;
 				}
 				
+				String [] permitUrls = new String[securityProperties.getPermitUrls().size()];
+				permitUrls = securityProperties.getPermitUrls().toArray(permitUrls);
+				
+				builder.authorizeRequests()
+				.antMatchers(permitUrls)
+				.permitAll().anyRequest().authenticated().and().csrf().disable();
 			}
 		};
 	}
