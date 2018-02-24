@@ -2,10 +2,12 @@ package com.nongyou.security.core.config;
 
 import java.util.Map;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import com.nongyou.security.core.properties.SecurityConstant;
+import com.nongyou.security.core.properties.SecurityProperties;
 import com.nongyou.security.core.validateCode.ImageCodeGenerator;
 import com.nongyou.security.core.validateCode.ImageCodeSender;
 import com.nongyou.security.core.validateCode.SmsCodeGenerator;
@@ -15,17 +17,18 @@ import com.nongyou.security.core.validateCode.ValidateCodeSender;
 import com.nongyou.security.core.validateCode.ValidateCodeServlet;
 
 @Configuration
+@EnableConfigurationProperties(SecurityProperties.class)
 public class ValidateCodeSecurityConfig {
 	@Bean
 	@ConditionalOnMissingBean(name="smsCodeGenerator")
-	public ValidateCodeGenerator smsCodeGenerator() {
-		return new SmsCodeGenerator();
+	public ValidateCodeGenerator smsCodeGenerator(SecurityProperties securityProperties) {
+		return new SmsCodeGenerator(securityProperties);
 	}
 	
 	@Bean
 	@ConditionalOnMissingBean(name="imageCodeGenerator")
-	public ValidateCodeGenerator imageCodeGenerator() {
-		return new ImageCodeGenerator();
+	public ValidateCodeGenerator imageCodeGenerator(SecurityProperties securityProperties) {
+		return new ImageCodeGenerator(securityProperties);
 	}
 	
 	@Bean

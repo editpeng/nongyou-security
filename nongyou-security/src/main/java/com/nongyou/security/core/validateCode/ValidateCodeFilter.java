@@ -14,7 +14,6 @@ import org.springframework.social.connect.web.SessionStrategy;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
 import org.springframework.web.bind.ServletRequestBindingException;
-import org.springframework.web.bind.ServletRequestUtils;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.filter.OncePerRequestFilter;
 import com.nongyou.security.core.properties.SecurityConstant;
@@ -103,12 +102,12 @@ public class ValidateCodeFilter extends OncePerRequestFilter{
 		String codeInRequest = "";
 		
 		if("img".equals(which)) {
-			codeInRequest = ServletRequestUtils.getRequiredStringParameter(request,"imgCode" );
+			codeInRequest = request.getParameter("imgCode");
 			sessionKey = SecurityConstant.IMAGE_SESSION_KEY;
 		}
 		if("sms".equals(which)) {
-			codeInRequest = ServletRequestUtils.getRequiredStringParameter(request,"smsCode" );
-			sessionKey = SecurityConstant.IMAGE_SESSION_KEY;
+			codeInRequest = request.getParameter("smsCode");
+			sessionKey = SecurityConstant.SMS_SESSION_KEY;
 		}
 		
 		ValidateCode codeInSession = (ValidateCode) sessionStrategy.getAttribute(new ServletWebRequest(request), sessionKey);

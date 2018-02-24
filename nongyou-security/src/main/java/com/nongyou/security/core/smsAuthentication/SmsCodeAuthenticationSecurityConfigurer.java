@@ -1,31 +1,34 @@
 package com.nongyou.security.core.smsAuthentication;
 
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
+import java.util.ArrayList;
+import java.util.List;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public class SmsCodeAuthenticationSecurityConfigurer
-		extends SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity> {
+public class SmsCodeAuthenticationSecurityConfigurer{
 	private AuthenticationSuccessHandler successHandler;
 	private AuthenticationFailureHandler failureHandler;
 	private UserDetailsService userDetailsService;
 
-	@Override
-	public void configure(HttpSecurity builder) throws Exception {
+	public void configureSmsAuth(HttpSecurity builder) throws Exception {
 		SmsCodeAuthenticationFilter smsCodeAuthenticationFilter = new SmsCodeAuthenticationFilter();
-		smsCodeAuthenticationFilter.setAuthenticationManager(builder.getSharedObject(AuthenticationManager.class));
 		smsCodeAuthenticationFilter.setAuthenticationSuccessHandler(successHandler);
 		smsCodeAuthenticationFilter.setAuthenticationFailureHandler(failureHandler);
-
+		
+		List<AuthenticationProvider> providers= new ArrayList<>();
 		SmsCodeAuthenticationProvider authenticationProvider = new SmsCodeAuthenticationProvider();
 		authenticationProvider.setUserDetailsService(userDetailsService);
-		builder.authenticationProvider(authenticationProvider).addFilterAfter(smsCodeAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+		providers.add(authenticationProvider);
+		smsCodeAuthenticationFilter.setAuthenticationManager(new ProviderManager(providers));
+
+		
+		builder.addFilterAfter(smsCodeAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 	}
 }

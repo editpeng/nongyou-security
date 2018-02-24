@@ -33,7 +33,7 @@ public class ValidateCodeServlet extends HttpServlet {
 		ValidateCodeSender validateCodeSender = null;
 		if(req.getRequestURI().endsWith("sms")) {
 			validateCodeGenerator =  validateCodeGenerators.get("smsCodeGenerator");
-			sessionKey = SecurityConstant.SMS_SSESSION_KEY;
+			sessionKey = SecurityConstant.SMS_SESSION_KEY;
 			validateCodeSender = validateCodeSenders.get("smsCodeSender");
 			
 		}
